@@ -1,6 +1,4 @@
 "use client";
-import { useState } from "react";
-
 export default function Create() {
   const handleCreate = async () => {
     const response = await fetch("/api/agent", {
