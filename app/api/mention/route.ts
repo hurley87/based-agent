@@ -7,7 +7,7 @@ export async function POST(request: Request) {
 
   const comments = req.comments;
 
-  comments.forEach((comment: any) => {
+  comments.forEach((comment: { data: `0x${string}`; topics: [] | [signature: `0x${string}`, ...args: `0x${string}`[]] }) => {
     const data = comment.data;
     const topics = comment.topics;
     // Return the transaction hash and link
