@@ -1,4 +1,4 @@
-import { decodeEventLog, parseAbi } from "viem";
+import { decodeEventLog } from "viem";
 import { abi } from "@/utils/abi";
 
 export async function POST(request: Request) {
