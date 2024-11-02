@@ -4,20 +4,22 @@ import { abi } from "@/utils/abi";
 export async function POST(request: Request) {
   const req = await request.json();
   console.log("req", req);
-  // Return the transaction hash and link
 
-  const data = decodeEventLog({
-    abi,
-    data: "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000002d313030302024454e4a4f592076696120656e6a6f792e74656368206672616d65206f6e2046617263617374657200000000000000000000000000000000000000",
-    topics: [
-      '0xb9490aee663998179ad13f9e1c1eb6189c71ad1a9ec87f33ad2766f98d9a268a',
-      '0x000000000000000000000000bd78783a26252baf756e22f0de764dfdcda7733c',
-      '0x000000000000000000000000e63445d68f292d9578a3da8433f40d99563f1ded',
-      '0x0000000000000000000000000000000000000000000000000000000000000001'
-    ]
-  })
+  const comments = req.comments;
 
-  console.log("data", data);
+  comments.forEach((comment: any) => {
+    const data = comment.data;
+    const topics = comment.topics;
+    // Return the transaction hash and link
+
+    const decoded = decodeEventLog({
+        abi,
+        data,
+        topics,
+      });
+
+    console.log("decoded", decoded);
+  });
 
   return Response.json({ gm: "GM" });
 }
