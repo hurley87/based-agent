@@ -30,9 +30,6 @@ export async function POST() {
 
     const text = result.text;
 
-    console.log('text', text);
-
-    // Return the transaction hash and link
     return Response.json(
     {
         text
