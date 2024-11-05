@@ -9,11 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^0.0.55",
     "@coinbase/coinbase-sdk": "^0.9.1",
+    "ai": "^3.4.33",
     "next": "15.0.2",
     "react": "19.0.0-rc-02c0e824-20241028",
     "react-dom": "19.0.0-rc-02c0e824-20241028",
-    "viem": "^2.21.39"
+    "viem": "^2.21.39",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20",
