@@ -609,7 +609,20 @@
   resolved "https://registry.yarnpkg.com/@ungap/structured-clone/-/structured-clone-1.2.0.tgz#756641adb587851b5ccb3e095daf27ae581c8406"
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
 
-abitype@1.0.6, abitype@^1.0.6:
+"@zoralabs/protocol-deployments@^0.3.7":
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/@zoralabs/protocol-deployments/-/protocol-deployments-0.3.7.tgz#f32aff6d493a00aaa88643ff6d3cff9f0fd0763f"
+  integrity sha512-8Bia78Wa+zsGVlHHqmRr6whDmBSgv2r4VgchEs9rDdtNt+mxCcVKnlPvj1GExBW9iOkbP8b3EoJ7ynGVy2ObUQ==
+
+"@zoralabs/protocol-sdk@^0.11.5":
+  version "0.11.5"
+  resolved "https://registry.yarnpkg.com/@zoralabs/protocol-sdk/-/protocol-sdk-0.11.5.tgz#fbdfc3b4ad93b8166e489eedbf0ff5507f651fe3"
+  integrity sha512-mTt0e9WifVQtDJe+0/uie+3cio5AwUkRIOGNmXS3CMlVIIUf+Gzu7V121250owtV0m4pjT3R8X+440A18X9pxg==
+  dependencies:
+    "@zoralabs/protocol-deployments" "^0.3.7"
+    abitype "^1.0.2"
+
+abitype@1.0.6, abitype@^1.0.2, abitype@^1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/abitype/-/abitype-1.0.6.tgz#76410903e1d88e34f1362746e2d407513c38565b"
   integrity sha512-MMSqYh4+C/aVqI2RQaWqbvI4Kxo5cQV40WQ4QFtDnNzCkqChm8MuENhElmynZlO0qUy/ObkEUaXtKqYnx1Kp3A==
