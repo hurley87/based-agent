@@ -1,8 +1,10 @@
-import { createOpenAI } from '@ai-sdk/openai';
-import { generateText } from 'ai';
+// import { createOpenAI } from '@ai-sdk/openai';
+// import { generateText } from 'ai';
 import { BASED_SANTA_ADDRESS, BASED_SANTA_ABI } from './basedSanta';
 import { baseSepolia } from 'viem/chains';
-import { createWalletClient, http } from 'viem';
+import { 
+    // createWalletClient, 
+    http } from 'viem';
 import { createPublicClient } from 'viem';
 const RPC_URL = 'https://sepolia.base.org';
 
@@ -11,16 +13,16 @@ const publicClient = createPublicClient({
     transport: http(RPC_URL),
 });
   
-const walletClient = createWalletClient({
-    chain: baseSepolia,
-    transport: http(RPC_URL),
-});
+// const walletClient = createWalletClient({
+//     chain: baseSepolia,
+//     transport: http(RPC_URL),
+// });
 
 
 export async function POST(request: Request) {
     const req = await request.json();
-    const { OPENAI_API_KEY } = process.env;
-    const castText = req.data.text;
+    // const { OPENAI_API_KEY } = process.env;
+    // const castText = req.data.text;
     const verifiedAddresses = req.data.author.verified_addresses;
     const verifiedAddress =
       verifiedAddresses?.eth_addresses?.[0] ||
@@ -55,10 +57,7 @@ export async function POST(request: Request) {
         );
     }
 
-
-
-
-    // check that they have a balance of 1M Based
+    // check that they have a balance of 1M Based (check BASED contract, balanceOf)
     // prompt that they have a balance of 1M Base
 
     // get present count
