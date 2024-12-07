@@ -1,4 +1,4 @@
-export const BASED_SANTA_ADDRESS = '0x13A1AdfC1ea3c546bAB0f30d225Cd4eAFf7dE015';
+export const BASED_SANTA_ADDRESS = '0xB4e59fD5A87464e7bf949AECC8f9aA91c7Fe804e';
 
 export const BASED_SANTA_ABI = [
     {
@@ -141,6 +141,34 @@ export const BASED_SANTA_ABI = [
       "name": "createERC721Present",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getNextPresent",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "tokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountOrTokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isERC20",
+          "type": "bool"
+        },
+        {
+          "internalType": "string",
+          "name": "description",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
