@@ -152,6 +152,17 @@ export async function POST(request: Request) {
   
     console.log('receipt', receipt);
 
+    // const uuid = process.env.SIGNER_UUID as string;
+    // console.log('uuid', uuid);
+  
+    // const replyTo = req.data.hash;
+    // console.log('replyTo', replyTo);
+  
+    // const reply = await neynarClient.publishCast(uuid, replyText, {
+    //   replyTo,
+    // });
+    // console.log('reply:', reply);
+
     return Response.json(
     {
         success: true,
