@@ -28,6 +28,8 @@ export async function POST() {
 
     const text = result.text;
 
+    console.log('text', text);
+
     return Response.json(
     {
         text
