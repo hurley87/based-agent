@@ -130,13 +130,13 @@ export async function POST(request: Request) {
         args: [],
     });
 
-    console.log('present', present);
+    console.log('present', present)
 
     const privateKey = process.env.SERVER_PRIVATE_KEY;
     const account = privateKeyToAccount(privateKey as `0x${string}`);
   
     // Add to allowlist
-    const { request: EnjoyRequest }: any = await publicClient.simulateContract({
+    const { request: EnjoyRequest } = await publicClient.simulateContract({
       account,
       address: BASED_SANTA_ADDRESS,
       abi: BASED_SANTA_ABI,
