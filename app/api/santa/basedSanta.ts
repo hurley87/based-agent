@@ -1,4 +1,4 @@
-export const BASED_SANTA_ADDRESS = '0xB4e59fD5A87464e7bf949AECC8f9aA91c7Fe804e';
+export const BASED_SANTA_ADDRESS = '0x2a041e205389101e725003A448A0D28B94B1302c';
 
 export const BASED_SANTA_ABI = [
     {
@@ -145,23 +145,8 @@ export const BASED_SANTA_ABI = [
     },
     {
       "inputs": [],
-      "name": "getNextPresent",
+      "name": "getNextPresentDescription",
       "outputs": [
-        {
-          "internalType": "address",
-          "name": "tokenAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amountOrTokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bool",
-          "name": "isERC20",
-          "type": "bool"
-        },
         {
           "internalType": "string",
           "name": "description",
