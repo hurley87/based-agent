@@ -438,14 +438,15 @@
   resolved "https://registry.yarnpkg.com/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-15.0.2.tgz#0f70d8146990886a85099875353539fc6dd68338"
   integrity sha512-foaUL0NqJY/dX0Pi/UcZm5zsmSk5MtP/gxx3xOPyREkMFN+CTjctPfu3QaqrQHinaKdPnMWPJDKt4VjDfTBe/Q==
 
-"@neynar/nodejs-sdk@^2.0.6":
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/@neynar/nodejs-sdk/-/nodejs-sdk-2.0.6.tgz#faba3347a38a453369a4ca9f228a4d19f4e1ca1d"
-  integrity sha512-fEpuwyp14cyKQbZYo8LbKuwJXQqqEQlZEto4ptOd+qUyD97vmS0u4xXRr7kXeOvhSXoqFTZVnFzthHToItul5w==
+"@neynar/nodejs-sdk@^1.67.2":
+  version "1.71.0"
+  resolved "https://registry.yarnpkg.com/@neynar/nodejs-sdk/-/nodejs-sdk-1.71.0.tgz#d8a87e75ad5754460108c8d8444e633cdd22069a"
+  integrity sha512-HlsnKMCBQq2YoQjq7IVO1qoSiCPbk90axq0mUXHnF3cKa/dhiDFLwcgVBexsU9G5KMKfvwVLWC2kIDe18IFzuA==
   dependencies:
-    "@openapitools/openapi-generator-cli" "^2.14.1"
-    semver "^7.6.3"
-    viem "^2.21.44"
+    "@openapitools/openapi-generator-cli" "^2.15.0"
+    axios "^1.6.2"
+    semver "^7.6.0"
+    viem "^2.21.14"
 
 "@noble/curves@1.2.0":
   version "1.2.0"
@@ -523,7 +524,7 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@^2.14.1":
+"@openapitools/openapi-generator-cli@^2.15.0":
   version "2.15.3"
   resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.15.3.tgz#3642aa438c46f2bf9bcdd6a278399e0709c94fdb"
   integrity sha512-2UBnsDlMt36thhdXxisbA1qReVtbCaw+NCvXoslRXlaJBL4qkAmZUhNeDLNu3LCbwA2PASMWhJSqeLwgwMCitw==
@@ -1026,6 +1027,15 @@ axios@1.7.7, axios@^1.6.8:
   version "1.7.7"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.7.tgz#2f554296f9892a72ac8d8e4c5b79c14a91d0a47f"
   integrity sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==
+  dependencies:
+    follow-redirects "^1.15.6"
+    form-data "^4.0.0"
+    proxy-from-env "^1.1.0"
+
+axios@^1.6.2:
+  version "1.7.9"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.9.tgz#d7d071380c132a24accda1b2cfc1535b79ec650a"
+  integrity sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==
   dependencies:
     follow-redirects "^1.15.6"
     form-data "^4.0.0"
@@ -4167,6 +4177,21 @@ uuid@^9.0.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
   integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
 
+viem@^2.21.14:
+  version "2.21.54"
+  resolved "https://registry.yarnpkg.com/viem/-/viem-2.21.54.tgz#76d6f86ab8809078f1ac140ac1a2beadbc86b9f6"
+  integrity sha512-G9mmtbua3UtnVY9BqAtWdNp+3AO+oWhD0B9KaEsZb6gcrOWgmA4rz02yqEMg+qW9m6KgKGie7q3zcHqJIw6AqA==
+  dependencies:
+    "@noble/curves" "1.7.0"
+    "@noble/hashes" "1.6.1"
+    "@scure/bip32" "1.6.0"
+    "@scure/bip39" "1.5.0"
+    abitype "1.0.7"
+    isows "1.0.6"
+    ox "0.1.2"
+    webauthn-p256 "0.0.10"
+    ws "8.18.0"
+
 viem@^2.21.26, viem@^2.21.39:
   version "2.21.39"
   resolved "https://registry.yarnpkg.com/viem/-/viem-2.21.39.tgz#f8fe891a7efaafe310bb050ddfe7243b63eea393"
@@ -4179,21 +4204,6 @@ viem@^2.21.26, viem@^2.21.39:
     "@scure/bip39" "1.4.0"
     abitype "1.0.6"
     isows "1.0.6"
-    webauthn-p256 "0.0.10"
-    ws "8.18.0"
-
-viem@^2.21.44:
-  version "2.21.54"
-  resolved "https://registry.yarnpkg.com/viem/-/viem-2.21.54.tgz#76d6f86ab8809078f1ac140ac1a2beadbc86b9f6"
-  integrity sha512-G9mmtbua3UtnVY9BqAtWdNp+3AO+oWhD0B9KaEsZb6gcrOWgmA4rz02yqEMg+qW9m6KgKGie7q3zcHqJIw6AqA==
-  dependencies:
-    "@noble/curves" "1.7.0"
-    "@noble/hashes" "1.6.1"
-    "@scure/bip32" "1.6.0"
-    "@scure/bip39" "1.5.0"
-    abitype "1.0.7"
-    isows "1.0.6"
-    ox "0.1.2"
     webauthn-p256 "0.0.10"
     ws "8.18.0"
 

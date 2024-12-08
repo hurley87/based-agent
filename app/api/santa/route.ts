@@ -12,9 +12,7 @@ import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 // import { privateKeyToAccount } from 'viem/accounts';
 
 const RPC_URL = 'https://sepolia.base.org';
-const neynarClient = new NeynarAPIClient({
-    apiKey: process.env.NEYNAR_API_KEY as string
-});
+const neynarClient = new NeynarAPIClient(process.env.NEYNAR_API_KEY as string);
 
 
 const publicClient = createPublicClient({
@@ -68,11 +66,13 @@ export async function POST(request: Request) {
     if(presentCount === 0) {
         console.log('prompt user no more presents')
         const replyText = 'No more presents';
-        await neynarClient.publishCast({
-            signerUuid: uuid,
-            text: replyText,
-            parent: replyTo,
-        });
+        await neynarClient.publishCast(
+            uuid,
+            replyText,
+            {
+              replyTo: replyTo,
+            }
+        );
         return Response.json(
             {
                 text: 'No more presents'
