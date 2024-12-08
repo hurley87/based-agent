@@ -29,8 +29,7 @@ export async function POST(request: Request) {
     // const { OPENAI_API_KEY } = process.env;
     // const castText = req.data.text;
 
-    const uuid = process.env.SIGNER_UUID as string;
-    console.log('uuid', uuid);
+
     const replyTo = req.data.hash;
     console.log('replyTo', replyTo);
   
@@ -63,25 +62,7 @@ export async function POST(request: Request) {
 
     if(presentCount === 0) {
         console.log('prompt user no more presents')
-        const url = 'https://api.neynar.com/v2/farcaster/cast';
-        const options = {
-          method: 'POST',
-          headers: {
-            accept: 'application/json',
-            'content-type': 'application/json',
-            'x-api-key': process.env.NEYNAR_API_KEY as string,
-          },
-          body: JSON.stringify({
-            signer_uuid: uuid,
-            text: 'No more presents',
-            parent: replyTo,
-          })
-        };
-        
-        await fetch(url, options)
-          .then(res => res.json())
-          .then(json => console.log(json))
-          .catch(err => console.error(err));
+        await sendFarcasterMessage('No more presents', replyTo);
 
         return Response.json(
             {
@@ -190,3 +171,31 @@ export async function POST(request: Request) {
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
+
+async function sendFarcasterMessage(text: string, replyTo: string) {
+    const uuid = process.env.SIGNER_UUID as string;
+  const url = 'https://api.neynar.com/v2/farcaster/cast';
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      'x-api-key': process.env.NEYNAR_API_KEY as string,
+    },
+    body: JSON.stringify({
+      signer_uuid: uuid,
+      text,
+      parent: replyTo,
+    })
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const json = await response.json();
+    console.log(json);
+    return json;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
