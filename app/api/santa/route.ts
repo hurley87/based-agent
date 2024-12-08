@@ -39,9 +39,7 @@ export async function POST(request: Request) {
     console.log('replyTo', replyTo);
   
     const verifiedAddresses = req.data.author.verified_addresses;
-    const verifiedAddress =
-      verifiedAddresses?.eth_addresses?.[0] ||
-      ('0xbD78783a26252bAf756e22f0DE764dfDcDa7733c' as `0x${string}`);
+    const verifiedAddress = verifiedAddresses?.eth_addresses?.[0];
 
     console.log('verifiedAddress', verifiedAddress);
 
@@ -70,12 +68,17 @@ export async function POST(request: Request) {
     if(presentCount === 0) {
         console.log('prompt user no more presents')
         const replyText = 'No more presents';
-        const reply = await neynarClient.publishCast({
+        await neynarClient.publishCast({
             signerUuid: uuid,
             text: replyText,
             parent: replyTo,
         });
-        console.log('reply:', reply);
+        return Response.json(
+            {
+                text: 'No more presents'
+            },
+            { status: 200 }
+        );
     }
 
     // check if verifiedAddress has received a present or not
