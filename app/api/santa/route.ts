@@ -114,7 +114,6 @@ export async function POST(request: Request) {
 
     // check that they have a balance of 1M Based (check BASED contract, balanceOf)
     // prompt that they have a balance of 1M Base
-    // 0x32E0f9d26D1e33625742A52620cC76C1130efde6
 
     const balance = await publicClient.readContract({
         abi: erc20Abi,
