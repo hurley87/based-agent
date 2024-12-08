@@ -8,11 +8,9 @@ import {
     // createWalletClient, 
     http } from 'viem';
 import { createPublicClient } from 'viem';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 // import { privateKeyToAccount } from 'viem/accounts';
 
 const RPC_URL = 'https://sepolia.base.org';
-const neynarClient = new NeynarAPIClient(process.env.NEYNAR_API_KEY as string);
 
 
 const publicClient = createPublicClient({
@@ -65,14 +63,26 @@ export async function POST(request: Request) {
 
     if(presentCount === 0) {
         console.log('prompt user no more presents')
-        const replyText = 'No more presents';
-        await neynarClient.publishCast(
-            uuid,
-            replyText,
-            {
-              replyTo: replyTo,
-            }
-        );
+        const url = 'https://api.neynar.com/v2/farcaster/cast';
+        const options = {
+          method: 'POST',
+          headers: {
+            accept: 'application/json',
+            'content-type': 'application/json',
+            'x-api-key': process.env.NEYNAR_API_KEY as string,
+          },
+          body: JSON.stringify({
+            signer_uuid: uuid,
+            text: 'No more presents',
+            parent: replyTo,
+          })
+        };
+        
+        await fetch(url, options)
+          .then(res => res.json())
+          .then(json => console.log(json))
+          .catch(err => console.error(err));
+
         return Response.json(
             {
                 text: 'No more presents'
