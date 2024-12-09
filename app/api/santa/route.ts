@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const verifiedAddresses = req.data.author.verified_addresses;
     const verifiedAddress = verifiedAddresses?.eth_addresses?.[0];
 
-    const isAskingForPresent = await generateSantaResponse(`User said: "${castText}". Return true if they are asking for a present, false otherwise.`);
+    const isAskingForPresent = await generateSantaResponse(`User said: "${castText}". Return true if they are asking for a present or what they got for christmas, false otherwise. Don't tag any user.`);
     console.log('isAskingForPresent', isAskingForPresent);
 
     if(isAskingForPresent.toString().toLowerCase() === 'false') {
