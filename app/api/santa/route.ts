@@ -94,7 +94,7 @@ export async function POST(request: Request) {
 
     if(presentCount === 0) {
         console.log('prompt user no more presents')
-        const text = await generateSantaResponse(`User said: ${castText} but there are no more presents. Reply to the user as if you were Based Santa. Explain they need a wallet to receive a present. Just return one sentence of text. No quotes and dont tag any user.`);
+        const text = await generateSantaResponse(`User said: "${castText}" but there are no more presents. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
         await sendFarcasterMessage(text, replyTo);
 
         return Response.json(
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
 
     if(hasReceivedPresent) {
         console.log('prompt user they have received a present')
-        const text = await generateSantaResponse(`User said: ${castText} but they have received a present. Reply to the user as if you were Based Santa. Explain they can only receive one present. Just return one sentence of text. No quotes and dont tag any user.`);
+        const text = await generateSantaResponse(`User said: "${castText}" but they have received a present. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
         await sendFarcasterMessage(text, replyTo);
 
         return Response.json(
@@ -142,7 +142,7 @@ export async function POST(request: Request) {
 
     if(balance < 1000000000000000000) {
         console.log('prompt user they dont have a balance of 1M Based')
-        const text = await generateSantaResponse(`User said: ${castText} but they don't have a balance of 1M Based. Reply to the user as if you were Based Santa. Explain they need a balance of 1M Based to receive a present. Just return one sentence of text. No quotes and dont tag any user.`);
+        const text = await generateSantaResponse(`User said: "${castText}" but they don't have a balance of 1M Based. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
         await sendFarcasterMessage(text, replyTo);
 
         return Response.json(
@@ -183,7 +183,7 @@ export async function POST(request: Request) {
   
     console.log('receipt', receipt);
 
-    const text = await generateSantaResponse(`User said: ${castText} and they have received a present. The present is ${presentDescription}. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
+    const text = await generateSantaResponse(`User said: "${castText}" and they have received a present. The present is ${presentDescription}. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
     await sendFarcasterMessage(text, replyTo);
 
     return Response.json(
