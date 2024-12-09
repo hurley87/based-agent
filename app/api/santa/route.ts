@@ -57,8 +57,8 @@ export async function POST(request: Request) {
     const isAskingForPresent = await generateSantaResponse(`User said: ${castText}. Return true if they are asking for a present, false otherwise.`);
     console.log('isAskingForPresent', isAskingForPresent);
 
-    if(isAskingForPresent === 'false') {
-        const text = await generateSantaResponse(`User said: ${castText}. Answer they question and suggest they ask for a present. Just return one sentence of text. No quotes and dont tag any user.`);
+    if(isAskingForPresent.toString().toLowerCase() === 'false') {
+        const text = await generateSantaResponse(`User said: ${castText}. Answer they question as Based Santa and suggest they ask for a present. Just return one sentence of text. No quotes and dont tag any user.`);
         await sendFarcasterMessage(text, replyTo);
         return Response.json(
             {
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
 
     if(!verifiedAddress) {
         console.log('prompt user they dont have a verified address')
-        const text = await generateSantaResponse(`User said: ${castText} but they don't have a wallet. Reply to the user as if you were Based Santa. Explain they need a wallet to receive a present. Just return one sentence of text. No quotes and dont tag any user.`);
+        const text = await generateSantaResponse(`User said: ${castText} but they don't have a wallet. Answer they question as Based Santa and explain they need a wallet to receive a present. Just return one sentence of text. No quotes and dont tag any user. Don't say "Based Santa" or "Based" in the response and don't say hey there.`);
         await sendFarcasterMessage(text, replyTo);
         return Response.json(
             {
