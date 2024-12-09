@@ -9,44 +9,6 @@ import { privateKeyToAccount } from 'viem/accounts';
 
 const RPC_URL = 'https://sepolia.base.org';
 
-
-const publicClient = createPublicClient({
-    chain: baseSepolia,
-    transport: http(RPC_URL),
-});
-  
-const walletClient = createWalletClient({
-    chain: baseSepolia,
-    transport: http(RPC_URL),
-});
-
-async function generateSantaResponse(text: string) {
-    const { OPENAI_API_KEY } = process.env;
-    
-    const openai = createOpenAI({
-        baseURL: "https://api.openai.com/v1",
-        apiKey: OPENAI_API_KEY,
-    });
-
-    const result = await generateText({
-        model: openai('gpt-4-turbo'),
-        messages: [
-            {
-                role: 'user',
-                content: [
-                    {
-                        type: 'text',
-                        text: baseSantaPrompt,
-                    },
-                    { type: 'text', text },
-                ],
-            },
-        ],
-    });
-
-    return result.text;
-}
-
 export async function POST(request: Request) {
     const req = await request.json();
     const castText = req.data.text;
@@ -54,11 +16,11 @@ export async function POST(request: Request) {
     const verifiedAddresses = req.data.author.verified_addresses;
     const verifiedAddress = verifiedAddresses?.eth_addresses?.[0];
 
-    const isAskingForPresent = await generateSantaResponse(`User said: ${castText}. Return true if they are asking for a present, false otherwise.`);
+    const isAskingForPresent = await generateSantaResponse(`User said: "${castText}". Return true if they are asking for a present, false otherwise.`);
     console.log('isAskingForPresent', isAskingForPresent);
 
     if(isAskingForPresent.toString().toLowerCase() === 'false') {
-        const text = await generateSantaResponse(`User said: ${castText}. Answer they question as Based Santa and suggest they ask for a present. Just return one sentence of text. No quotes and dont tag any user.`);
+        const text = await generateSantaResponse(`User said: "${castText}". Answer they question as Based Santa and suggest they ask for a present. Just return one sentence of text. No quotes and dont tag any user.`);
         await sendFarcasterMessage(text, replyTo);
         return Response.json(
             {
@@ -70,7 +32,7 @@ export async function POST(request: Request) {
 
     if(!verifiedAddress) {
         console.log('prompt user they dont have a verified address')
-        const text = await generateSantaResponse(`User said: ${castText} but they don't have a wallet. Answer they question as Based Santa and explain they need a wallet to receive a present. Just return one sentence of text. No quotes and dont tag any user. Don't say "Based Santa" or "Based" in the response and don't say hey there.`);
+        const text = await generateSantaResponse(`User said: "${castText}" but they don't have a wallet. Answer they question as Based Santa and explain they need a wallet to receive a present. Just return one sentence of text. No quotes and dont tag any user. Don't say "Based Santa" or "Based" in the response and don't say hey there.`);
         await sendFarcasterMessage(text, replyTo);
         return Response.json(
             {
@@ -196,6 +158,43 @@ export async function POST(request: Request) {
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
+
+const publicClient = createPublicClient({
+    chain: baseSepolia,
+    transport: http(RPC_URL),
+});
+  
+const walletClient = createWalletClient({
+    chain: baseSepolia,
+    transport: http(RPC_URL),
+});
+
+async function generateSantaResponse(text: string) {
+    const { OPENAI_API_KEY } = process.env;
+    
+    const openai = createOpenAI({
+        baseURL: "https://api.openai.com/v1",
+        apiKey: OPENAI_API_KEY,
+    });
+
+    const result = await generateText({
+        model: openai('gpt-4-turbo'),
+        messages: [
+            {
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: baseSantaPrompt,
+                    },
+                    { type: 'text', text },
+                ],
+            },
+        ],
+    });
+
+    return result.text;
+}
 
 async function sendFarcasterMessage(text: string, replyTo: string) {
   const uuid = process.env.SIGNER_UUID as string;
