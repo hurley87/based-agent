@@ -125,7 +125,7 @@ export async function POST(request: Request) {
     console.log('sending present to', verifiedAddress);
 
     const privateKey = process.env.PRIVATE_KEY;
-    const account = privateKeyToAccount(privateKey as `0x${string}`);
+    const account = privateKeyToAccount(`0x${privateKey}` as `0x${string}`);
   
     // send present
     const { request: EnjoyRequest } = await publicClient.simulateContract({
