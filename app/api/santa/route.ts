@@ -173,7 +173,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 async function sendFarcasterMessage(text: string, replyTo: string) {
-    const uuid = process.env.SIGNER_UUID as string;
+  const uuid = process.env.SIGNER_UUID as string;
   const url = 'https://api.neynar.com/v2/farcaster/cast';
   const options = {
     method: 'POST',
