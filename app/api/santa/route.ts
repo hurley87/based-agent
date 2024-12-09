@@ -2,14 +2,10 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import { BASED_SANTA_ADDRESS, BASED_SANTA_ABI } from './basedSanta';
 import { baseSepolia } from 'viem/chains';
-import { 
-    // createWalletClient,
-    erc20Abi,
-    // createWalletClient, 
-    http } from 'viem';
+import { erc20Abi, createWalletClient, http } from 'viem';
 import { createPublicClient } from 'viem';
 import { baseSantaPrompt } from './prompt';
-// import { privateKeyToAccount } from 'viem/accounts';
+import { privateKeyToAccount } from 'viem/accounts';
 
 const RPC_URL = 'https://sepolia.base.org';
 
@@ -19,42 +15,41 @@ const publicClient = createPublicClient({
     transport: http(RPC_URL),
 });
   
-// const walletClient = createWalletClient({
-//     chain: baseSepolia,
-//     transport: http(RPC_URL),
-// });
+const walletClient = createWalletClient({
+    chain: baseSepolia,
+    transport: http(RPC_URL),
+});
 
-
-export async function POST(request: Request) {
-    const req = await request.json();
+async function generateSantaResponse(text: string) {
     const { OPENAI_API_KEY } = process.env;
-    // const castText = req.data.text;
-
+    
     const openai = createOpenAI({
         baseURL: "https://api.openai.com/v1",
         apiKey: OPENAI_API_KEY,
     });
 
     const result = await generateText({
-      model: openai('gpt-4-turbo'),
-      messages: [
-          {
-          role: 'user',
-          content: [
-              {
-                type: 'text',
-                text: baseSantaPrompt,
-              },
-              { type: 'text', text: "What would Based Santa say to someone who doesn't have a wallet? Explain they need a wallet to receive a present. Just return one sentence of text. No quotes. " },
-          ],
-          },
-      ],
+        model: openai('gpt-4-turbo'),
+        messages: [
+            {
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: baseSantaPrompt,
+                    },
+                    { type: 'text', text },
+                ],
+            },
+        ],
     });
 
-    const text = result.text;
+    return result.text;
+}
 
-    console.log('PROMPT TEXT', text);
-
+export async function POST(request: Request) {
+    const req = await request.json();
+    // const castText = req.data.text;
 
     const replyTo = req.data.hash;  
     const verifiedAddresses = req.data.author.verified_addresses;
@@ -62,9 +57,11 @@ export async function POST(request: Request) {
 
     if(!verifiedAddress) {
         console.log('prompt user they dont have a verified address')
+        const text = await generateSantaResponse(`User said: ${req.data.text} but they don't have a wallet. Reply to the user as if you were Based Santa. Explain they need a wallet to receive a present. Just return one sentence of text. No quotes.`);
+        await sendFarcasterMessage(text, replyTo);
         return Response.json(
             {
-                text: 'You are not verified'
+                success: true
             },
             { status: 200 }
         );
@@ -84,11 +81,12 @@ export async function POST(request: Request) {
 
     if(presentCount === 0) {
         console.log('prompt user no more presents')
-        await sendFarcasterMessage('No more presents', replyTo);
+        const text = await generateSantaResponse(`User said: ${req.data.text} but there are no more presents. Reply to the user as if you were Based Santa. Explain they need a wallet to receive a present. Just return one sentence of text. No quotes.`);
+        await sendFarcasterMessage(text, replyTo);
 
         return Response.json(
             {
-                text: 'No more presents'
+                success: true
             },
             { status: 200 }
         );
@@ -105,11 +103,14 @@ export async function POST(request: Request) {
 
     console.log('hasReceivedPresent', hasReceivedPresent);
 
-    if(!hasReceivedPresent) {
+    if(hasReceivedPresent) {
         console.log('prompt user they have received a present')
+        const text = await generateSantaResponse(`User said: ${req.data.text} but they have received a present. Reply to the user as if you were Based Santa. Explain they can only receive one present. Just return one sentence of text. No quotes.`);
+        await sendFarcasterMessage(text, replyTo);
+
         return Response.json(
             {
-                text: 'You have not received a present'
+                success: true
             },
             { status: 200 }
         );
@@ -117,7 +118,6 @@ export async function POST(request: Request) {
 
     // check that they have a balance of 1M Based (check BASED contract, balanceOf)
     // prompt that they have a balance of 1M Base
-
     const balance = await publicClient.readContract({
         abi: erc20Abi,
         address: "0x32E0f9d26D1e33625742A52620cC76C1130efde6",
@@ -127,6 +127,18 @@ export async function POST(request: Request) {
 
     console.log('balance', balance); 
 
+    if(balance < 1000000000000000000) {
+        console.log('prompt user they dont have a balance of 1M Based')
+        const text = await generateSantaResponse(`User said: ${req.data.text} but they don't have a balance of 1M Based. Reply to the user as if you were Based Santa. Explain they need a balance of 1M Based to receive a present. Just return one sentence of text. No quotes.`);
+        await sendFarcasterMessage(text, replyTo);
+
+        return Response.json(
+            {
+                success: true
+            },
+            { status: 200 }
+        );
+    }
 
     // get present
     const presentDescription = await publicClient.readContract({
@@ -138,25 +150,28 @@ export async function POST(request: Request) {
 
     console.log('presentDescription', presentDescription)
 
-    // const privateKey = process.env.SERVER_PRIVATE_KEY;
-    // const account = privateKeyToAccount(privateKey as `0x${string}`);
+    const privateKey = process.env.SERVER_PRIVATE_KEY;
+    const account = privateKeyToAccount(privateKey as `0x${string}`);
   
-    // // send present
-    // const { request: EnjoyRequest } = await publicClient.simulateContract({
-    //   account,
-    //   address: BASED_SANTA_ADDRESS,
-    //   abi: BASED_SANTA_ABI,
-    //   functionName: 'sendNextPresent',
-    //   args: [verifiedAddress]
-    // });
+    // send present
+    const { request: EnjoyRequest } = await publicClient.simulateContract({
+      account,
+      address: BASED_SANTA_ADDRESS,
+      abi: BASED_SANTA_ABI,
+      functionName: 'sendNextPresent',
+      args: [verifiedAddress]
+    });
   
-    // const hash = await walletClient.writeContract(EnjoyRequest);
+    const hash = await walletClient.writeContract(EnjoyRequest);
   
-    // console.log('hash', hash);
+    console.log('hash', hash);
   
-    // const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+    const receipt = await publicClient?.waitForTransactionReceipt({ hash });
   
-    // console.log('receipt', receipt);
+    console.log('receipt', receipt);
+
+    const text = await generateSantaResponse(`User said: ${req.data.text} and they have received a present. The present is ${presentDescription}. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes.`);
+    await sendFarcasterMessage(text, replyTo);
 
     return Response.json(
     {
