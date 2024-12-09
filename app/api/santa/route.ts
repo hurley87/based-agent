@@ -1,13 +1,11 @@
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import { BASED_SANTA_ADDRESS, BASED_SANTA_ABI } from './basedSanta';
-import { baseSepolia } from 'viem/chains';
+import { base } from 'viem/chains';
 import { erc20Abi, createWalletClient, http } from 'viem';
 import { createPublicClient } from 'viem';
 import { baseSantaPrompt } from './prompt';
 import { privateKeyToAccount } from 'viem/accounts';
-
-const RPC_URL = 'https://sepolia.base.org';
 
 export async function POST(request: Request) {
     const req = await request.json();
@@ -159,13 +157,15 @@ export async function POST(request: Request) {
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
+const RPC_URL = process.env.BASED_RPC_URL as string;
+
 const publicClient = createPublicClient({
-    chain: baseSepolia,
+    chain: base,
     transport: http(RPC_URL),
 });
   
 const walletClient = createWalletClient({
-    chain: baseSepolia,
+    chain: base,
     transport: http(RPC_URL),
 });
 
