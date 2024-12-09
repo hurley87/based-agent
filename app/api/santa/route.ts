@@ -1,5 +1,5 @@
-// import { createOpenAI } from '@ai-sdk/openai';
-// import { generateText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
+import { generateText } from 'ai';
 import { BASED_SANTA_ADDRESS, BASED_SANTA_ABI } from './basedSanta';
 import { baseSepolia } from 'viem/chains';
 import { 
@@ -8,6 +8,7 @@ import {
     // createWalletClient, 
     http } from 'viem';
 import { createPublicClient } from 'viem';
+import { baseSantaPrompt } from './prompt';
 // import { privateKeyToAccount } from 'viem/accounts';
 
 const RPC_URL = 'https://sepolia.base.org';
@@ -26,17 +27,38 @@ const publicClient = createPublicClient({
 
 export async function POST(request: Request) {
     const req = await request.json();
-    // const { OPENAI_API_KEY } = process.env;
+    const { OPENAI_API_KEY } = process.env;
     // const castText = req.data.text;
 
+    const openai = createOpenAI({
+        baseURL: "https://api.openai.com/v1",
+        apiKey: OPENAI_API_KEY,
+    });
 
-    const replyTo = req.data.hash;
-    console.log('replyTo', replyTo);
-  
+    const result = await generateText({
+      model: openai('gpt-4-turbo'),
+      messages: [
+          {
+          role: 'user',
+          content: [
+              {
+                type: 'text',
+                text: baseSantaPrompt,
+              },
+              { type: 'text', text: "What would Based Santa say to someone who doesn't have a wallet? Explain they need a wallet to receive a present. Just return one sentence of text. No quotes. " },
+          ],
+          },
+      ],
+    });
+
+    const text = result.text;
+
+    console.log('PROMPT TEXT', text);
+
+
+    const replyTo = req.data.hash;  
     const verifiedAddresses = req.data.author.verified_addresses;
     const verifiedAddress = verifiedAddresses?.eth_addresses?.[0];
-
-    console.log('verifiedAddress', verifiedAddress);
 
     if(!verifiedAddress) {
         console.log('prompt user they dont have a verified address')
@@ -105,31 +127,6 @@ export async function POST(request: Request) {
 
     console.log('balance', balance); 
 
-    // const openai = createOpenAI({
-    //     baseURL: "https://api.openai.com/v1",
-    //     apiKey: OPENAI_API_KEY,
-    // });
-
-    // const result = await generateText({
-    // model: openai('gpt-4-turbo'),
-    // messages: [
-    //     {
-    //     role: 'user',
-    //     content: [
-    //         { type: 'text', text: 'You are a JavaScript expert.' },
-    //         {
-    //         type: 'text',
-    //         text: `Error message: 403`,
-    //         },
-    //         { type: 'text', text: 'Explain the error message.' },
-    //     ],
-    //     },
-    // ],
-    // });
-
-    // const text = result.text;
-
-    // console.log('text', text);
 
     // get present
     const presentDescription = await publicClient.readContract({
