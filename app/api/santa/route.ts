@@ -7,10 +7,35 @@ import { createPublicClient } from 'viem';
 import { baseSantaPrompt } from './prompt';
 import { privateKeyToAccount } from 'viem/accounts';
 
+function isWithinDeliveryHours(): boolean {
+  const now = new Date();
+  const est = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const hour = est.getHours();
+  return hour >= 19 && hour < 23; // 7 PM - 11 PM EST
+}
+
+// function isAfterStartDate(): boolean {
+//   const now = new Date();
+//   const est = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+//   const startDate = new Date('2023-12-12');
+//   return est >= startDate;
+// }
+
 export async function POST(request: Request) {
     const req = await request.json();
     const castText = req.data.text;
-    const replyTo = req.data.hash;  
+    const replyTo = req.data.hash;
+
+    if (!isWithinDeliveryHours()) {
+        await sendFarcasterMessage("Ho ho ho! Based Santa delivers presents between 7-11pm EST daily beginning on December 12th", replyTo);
+        return Response.json(
+            {
+                success: true
+            },
+            { status: 200 }
+        );
+    }
+
     const verifiedAddresses = req.data.author.verified_addresses;
     const verifiedAddress = verifiedAddresses?.eth_addresses?.[0];
 
