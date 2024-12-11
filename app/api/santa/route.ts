@@ -14,13 +14,6 @@ function isWithinDeliveryHours(): boolean {
   return hour >= 19 && hour < 23; // 7 PM - 11 PM EST
 }
 
-// function isAfterStartDate(): boolean {
-//   const now = new Date();
-//   const est = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-//   const startDate = new Date('2023-12-12');
-//   return est >= startDate;
-// }
-
 export async function POST(request: Request) {
     const req = await request.json();
     const castText = req.data.text;
