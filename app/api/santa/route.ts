@@ -66,7 +66,6 @@ export async function POST(request: Request) {
         functionName: 'getUnsentPresentsCount',
       })) as bigint;
 
-    console.log('presentCount', presentCountBigInt);
     const presentCount = Number(presentCountBigInt);
     console.log('presentCount', presentCount);
 
