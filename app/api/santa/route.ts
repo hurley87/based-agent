@@ -19,6 +19,8 @@ export async function POST(request: Request) {
     const req = await request.json();
     const castText = req.data.text;
     const replyTo = req.data.hash;
+    console.log('castText', castText);
+    console.log('replyTo', replyTo);
 
     if (!isWithinDeliveryHours()) {
         await sendFarcasterMessage("Ho ho ho! Based Santa delivers presents between 7-11pm EST daily beginning on December 12th", replyTo);
