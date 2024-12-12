@@ -1,4 +1,4 @@
-export const BASED_SANTA_ADDRESS = '0x829f28c9de01FaF8B775d71f19aCFA452645F652';
+export const BASED_SANTA_ADDRESS = '0x15ff8571bB2E18cF7f6f7519EFf455c60564ACAA';
 
 export const BASED_SANTA_ABI = [
   {
@@ -108,6 +108,19 @@ export const BASED_SANTA_ABI = [
       }
     ],
     "name": "PresentSent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isPaused",
+        "type": "bool"
+      }
+    ],
+    "name": "SecondGiftsPauseStateChanged",
     "type": "event"
   },
   {
@@ -312,6 +325,13 @@ export const BASED_SANTA_ABI = [
   },
   {
     "inputs": [],
+    "name": "pauseSecondGifts",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "presentCounter",
     "outputs": [
       {
@@ -402,6 +422,19 @@ export const BASED_SANTA_ABI = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "secondGiftsPaused",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -423,6 +456,13 @@ export const BASED_SANTA_ABI = [
       }
     ],
     "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "unpauseSecondGifts",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
