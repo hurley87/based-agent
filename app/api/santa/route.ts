@@ -12,7 +12,7 @@ function isWithinDeliveryHours(): boolean {
   const est = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
   const hour = est.getHours();
   console.log('hour', hour);
-  return hour >= 17 && hour < 18; // 7 PM - 11 PM EST
+  return hour >= 19 && hour < 23; // 7 PM - 11 PM EST
 }
 
 export async function POST(request: Request) {
