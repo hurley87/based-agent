@@ -87,16 +87,16 @@ export async function POST(request: Request) {
 
     // check if verifiedAddress has received a present or not
     // prompt that they have received a present
-    const hasReceivedPresent = (await publicClient.readContract({
+    const canReceivePresent = (await publicClient.readContract({
         abi: BASED_SANTA_ABI,
         address: BASED_SANTA_ADDRESS,
-        functionName: 'hasReceivedPresent',
+        functionName: 'canReceivePresent',
         args: [verifiedAddress],
       })) as boolean;
 
-    console.log('hasReceivedPresent', hasReceivedPresent);
+    console.log('canReceivePresent', canReceivePresent);
 
-    if(hasReceivedPresent) {
+    if(canReceivePresent) {
         console.log('prompt user they have received a present')
         const text = await generateSantaResponse(`User said: "${castText}" but they have received a present. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
         await sendFarcasterMessage(text, replyTo);
