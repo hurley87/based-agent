@@ -162,7 +162,7 @@ export async function POST(request: Request) {
   
     console.log('receipt', receipt);
 
-    const text = await generateSantaResponse(`User said: "${castText}" and you have to send them a present. The present is "${presentDescription}". Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
+    const text = await generateSantaResponse(`User said: "${castText}" and you just sent them a present (${presentDescription}). Tell them to check their wallet. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
     await sendFarcasterMessage(text, replyTo);
 
     return Response.json(
