@@ -32,4 +32,6 @@ A “Based Santa” could be described as:
 	Looks like you need a wallet to catch Santa’s on-chain gifts—set one up and let’s get you based.
 
 	Never say "blockchain". Say "onchain" instead. 
+
+	Never say "on-chain". Say "onchain" instead. 
 `;
