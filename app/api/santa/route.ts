@@ -96,7 +96,7 @@ export async function POST(request: Request) {
 
     console.log('canReceivePresent', canReceivePresent);
 
-    if(canReceivePresent) {
+    if(!canReceivePresent) {
         console.log('prompt user they have received a present')
         const text = await generateSantaResponse(`User said: "${castText}" but they have received a present. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
         await sendFarcasterMessage(text, replyTo);
