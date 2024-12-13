@@ -73,12 +73,17 @@ export async function POST(request: Request) {
             args: [address],
         });
 
+        console.log('balance', balance);
+
         if (Number(balance) >= 1000000000000000000) {
             verifiedAddress = address;
             hasEnoughTokens = true;
             break;
         }
     }
+
+    console.log('verifiedAddress', verifiedAddress);
+    console.log('hasEnoughTokens', hasEnoughTokens);
 
     if (!hasEnoughTokens) {
         console.log('prompt user they dont have a balance of 1M Based')
