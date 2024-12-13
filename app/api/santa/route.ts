@@ -22,8 +22,14 @@ export async function POST(request: Request) {
     console.log('castText', castText);
     console.log('replyTo', replyTo);
 
-    if (!isWithinDeliveryHours()) {
-        await sendFarcasterMessage("Ho ho ho! Based Santa delivers presents between 7-11pm EST daily beginning on December 12th", replyTo);
+
+
+    const isAskingAboutBased = await generateSantaResponse(`User said: "${castText}". Return true if they are asking about BASED, false otherwise. Don't tag any user.`);
+    console.log('isAskingAboutBased', isAskingAboutBased);
+
+    if(isAskingAboutBased.toString().toLowerCase() === 'true') {
+        const text = await generateSantaResponse(`User said: "${castText}". Answer they question as Based Santa and explain BASED. Just return one sentence of text. No quotes and dont tag any user.`);
+        await sendFarcasterMessage(text, replyTo);
         return Response.json(
             {
                 success: true
@@ -45,13 +51,9 @@ export async function POST(request: Request) {
             { status: 200 }
         );
     }
-
-    const isAskingAboutBased = await generateSantaResponse(`User said: "${castText}". Return true if they are asking about BASED, false otherwise. Don't tag any user.`);
-    console.log('isAskingAboutBased', isAskingAboutBased);
-
-    if(isAskingAboutBased.toString().toLowerCase() === 'true') {
-        const text = await generateSantaResponse(`User said: "${castText}". Answer they question as Based Santa and explain BASED. Just return one sentence of text. No quotes and dont tag any user.`);
-        await sendFarcasterMessage(text, replyTo);
+    
+    if (!isWithinDeliveryHours()) {
+        await sendFarcasterMessage("Ho ho ho! Based Santa delivers presents between 7-11pm EST daily beginning on December 12th", replyTo);
         return Response.json(
             {
                 success: true
@@ -59,6 +61,7 @@ export async function POST(request: Request) {
             { status: 200 }
         );
     }
+
 
     const verifiedAddresses = req.data.author.verified_addresses;
     let verifiedAddress = null;
