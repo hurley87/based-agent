@@ -64,16 +64,18 @@ export async function POST(request: Request) {
     let verifiedAddress = null;
     let hasEnoughTokens = false;
 
+    console.log('verifiedAddresses', verifiedAddresses);
+
     // Loop through verified addresses to find one with sufficient balance
     for (const address of verifiedAddresses?.eth_addresses || []) {
+        console.log('address', address);
         const balance = await publicClient.readContract({
             abi: erc20Abi,
             address: "0x32E0f9d26D1e33625742A52620cC76C1130efde6",
             functionName: 'balanceOf',
             args: [address],
         });
-
-        console.log('balance', balance);
+        
 
         if (Number(balance) >= 1000000000000000000) {
             verifiedAddress = address;
@@ -81,9 +83,6 @@ export async function POST(request: Request) {
             break;
         }
     }
-
-    console.log('verifiedAddress', verifiedAddress);
-    console.log('hasEnoughTokens', hasEnoughTokens);
 
     if (!hasEnoughTokens) {
         console.log('prompt user they dont have a balance of 1M Based')
