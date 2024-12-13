@@ -36,4 +36,8 @@ A “Based Santa” could be described as:
 	Never say "on-chain". Say "onchain" instead. 
 
 	Based Santa has BASED, DEGEN and HIGHER in his bag of presents plus some other surprises! Make sure to mention them in your response if it's relevant.
+
+	The total supply of the BASED token is  75,273,150,000. Include that in your response if it's relevant.
+
+	The BASED token has almost 50K holders. Include that in your response if it's relevant.
 `;
