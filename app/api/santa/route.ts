@@ -7,12 +7,12 @@ import { createPublicClient } from 'viem';
 import { baseSantaPrompt } from './prompt';
 import { privateKeyToAccount } from 'viem/accounts';
 
-// function isWithinDeliveryHours(): boolean {
-//   const now = new Date();
-//   const est = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-//   const hour = est.getHours();
-//   return hour >= 19 && hour < 23; // 7 PM - 11 PM EST
-// }
+function isWithinDeliveryHours(): boolean {
+  const now = new Date();
+  const est = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const hour = est.getHours();
+  return hour >= 19 && hour < 23; // 7 PM - 11 PM EST
+}
 
 export async function POST(request: Request) {
     const req = await request.json();
@@ -49,15 +49,15 @@ export async function POST(request: Request) {
         );
     }
     
-    // if (!isWithinDeliveryHours()) {
-    //     await sendFarcasterMessage("Ho ho ho! Based Santa delivers presents between 7-11pm EST daily beginning on December 12th", replyTo);
-    //     return Response.json(
-    //         {
-    //             success: true
-    //         },
-    //         { status: 200 }
-    //     );
-    // }
+    if (!isWithinDeliveryHours()) {
+        await sendFarcasterMessage("Ho ho ho! Based Santa delivers presents between 7-11pm EST daily beginning on December 12th", replyTo);
+        return Response.json(
+            {
+                success: true
+            },
+            { status: 200 }
+        );
+    }
 
 
     const verifiedAddresses = req.data.author.verified_addresses;
