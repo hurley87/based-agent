@@ -32,9 +32,6 @@ export async function POST(request: Request) {
         );
     }
 
-    const verifiedAddresses = req.data.author.verified_addresses;
-    const verifiedAddress = verifiedAddresses?.eth_addresses?.[0];
-
     const isAskingForPresent = await generateSantaResponse(`User said: "${castText}". Return true if they are asking for a present or anything related to christmas and presents, false otherwise. Don't tag any user.`);
     console.log('isAskingForPresent', isAskingForPresent);
 
@@ -49,7 +46,39 @@ export async function POST(request: Request) {
         );
     }
 
-    if(!verifiedAddress) {
+    const verifiedAddresses = req.data.author.verified_addresses;
+    let verifiedAddress = null;
+    let hasEnoughTokens = false;
+
+    // Loop through verified addresses to find one with sufficient balance
+    for (const address of verifiedAddresses?.eth_addresses || []) {
+        const balance = await publicClient.readContract({
+            abi: erc20Abi,
+            address: "0x32E0f9d26D1e33625742A52620cC76C1130efde6",
+            functionName: 'balanceOf',
+            args: [address],
+        });
+
+        if (Number(balance) >= 1000000000000000000) {
+            verifiedAddress = address;
+            hasEnoughTokens = true;
+            break;
+        }
+    }
+
+    if (!hasEnoughTokens) {
+        console.log('prompt user they dont have a balance of 1M Based')
+        await sendFarcasterMessage("You're on the naughty list. Grab 1M Based and try asking me again, 0x32E0f9d26D1e33625742A52620cC76C1130efde6", replyTo);
+
+        return Response.json(
+            {
+                success: true
+            },
+            { status: 200 }
+        );
+    }
+
+    if (!verifiedAddress) {
         console.log('prompt user they dont have a verified address')
         const text = await generateSantaResponse(`User said: "${castText}" but they don't have a wallet. Answer they question as Based Santa and explain they need a wallet to receive a present. Just return one sentence of text. No quotes and dont tag any user. Don't say "Based Santa" or "Based" in the response and don't say hey there.`);
         await sendFarcasterMessage(text, replyTo);
@@ -100,29 +129,6 @@ export async function POST(request: Request) {
         console.log('prompt user they have received a present')
         const text = await generateSantaResponse(`User said: "${castText}" but they have received a present. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
         await sendFarcasterMessage(text, replyTo);
-
-        return Response.json(
-            {
-                success: true
-            },
-            { status: 200 }
-        );
-    }
-
-    // check that they have a balance of 1M Based (check BASED contract, balanceOf)
-    // prompt that they have a balance of 1M Base
-    const balance = await publicClient.readContract({
-        abi: erc20Abi,
-        address: "0x32E0f9d26D1e33625742A52620cC76C1130efde6",
-        functionName: 'balanceOf',
-        args: [verifiedAddress],
-    });
-
-    console.log('balance', balance); 
-
-    if(Number(balance) < 1000000000000000000) {
-        console.log('prompt user they dont have a balance of 1M Based')
-        await sendFarcasterMessage("You're on the naughty list. Grab 1M Based and try asking me again, 0x32E0f9d26D1e33625742A52620cC76C1130efde6", replyTo);
 
         return Response.json(
             {
