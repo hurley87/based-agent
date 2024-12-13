@@ -122,8 +122,7 @@ export async function POST(request: Request) {
 
     if(Number(balance) < 1000000000000000000) {
         console.log('prompt user they dont have a balance of 1M Based')
-        const text = await generateSantaResponse(`User said: "${castText}" but they don't have a balance of 1M Based. Reply to the user as if you were Based Santa. Just return one sentence of text. No quotes and dont tag any user.`);
-        await sendFarcasterMessage(text, replyTo);
+        await sendFarcasterMessage("You're on the naughty list. Grab 1M Based and try asking me again, 0x32E0f9d26D1e33625742A52620cC76C1130efde6", replyTo);
 
         return Response.json(
             {
