@@ -84,10 +84,10 @@ export async function POST(request: Request) {
         }
     }
 
-    if (!hasEnoughTokens) {
-        console.log('prompt user they dont have a balance of 1M Based')
-        await sendFarcasterMessage("You're on the naughty list. Grab 1M Based and try asking me again, 0x32E0f9d26D1e33625742A52620cC76C1130efde6", replyTo);
-
+    if (!verifiedAddress) {
+        console.log('prompt user they dont have a verified address')
+        const text = await generateSantaResponse(`User said: "${castText}" but they don't have a wallet. Answer they question as Based Santa and explain they need a wallet to receive a present. Just return one sentence of text. No quotes and dont tag any user. Don't say "Based Santa" or "Based" in the response and don't say hey there.`);
+        await sendFarcasterMessage(text, replyTo);
         return Response.json(
             {
                 success: true
@@ -96,10 +96,10 @@ export async function POST(request: Request) {
         );
     }
 
-    if (!verifiedAddress) {
-        console.log('prompt user they dont have a verified address')
-        const text = await generateSantaResponse(`User said: "${castText}" but they don't have a wallet. Answer they question as Based Santa and explain they need a wallet to receive a present. Just return one sentence of text. No quotes and dont tag any user. Don't say "Based Santa" or "Based" in the response and don't say hey there.`);
-        await sendFarcasterMessage(text, replyTo);
+    if (!hasEnoughTokens) {
+        console.log('prompt user they dont have a balance of 1M Based')
+        await sendFarcasterMessage("You're on the naughty list. Grab 1M Based and try asking me again, 0x32E0f9d26D1e33625742A52620cC76C1130efde6", replyTo);
+
         return Response.json(
             {
                 success: true
