@@ -35,6 +35,16 @@ export async function POST(request: Request) {
         );
     }
 
+    const experimental = req.author.experimental;
+    console.log('experimental', experimental);
+    const neynarUserScore = experimental.neynar_user_score;
+    console.log('neynarUserScore', neynarUserScore);
+  
+    if (neynarUserScore <= 0.3) {
+        await sendFarcasterMessage("Your neynar score of " + neynarUserScore + " is too low. Your score updates weekly. More details: https://neynar.com/docs/user-score", replyTo);
+        return Response.json({ error: 'Low neynar score' });
+    }
+
     const isAskingForPresent = await generateSantaResponse(`User said: "${castText}". Return true if they are asking for a present or anything related to christmas and presents, false otherwise. Don't tag any user.`);
     console.log('isAskingForPresent', isAskingForPresent);
 
@@ -65,6 +75,8 @@ export async function POST(request: Request) {
     let hasEnoughTokens = false;
 
     console.log('verifiedAddresses', verifiedAddresses);
+
+
 
     // Loop through verified addresses to find one with sufficient balance
     for (const address of verifiedAddresses?.eth_addresses || []) {
