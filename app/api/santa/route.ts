@@ -19,7 +19,6 @@ export async function POST(request: Request) {
     const castText = req.data.text;
     const replyTo = req.data.hash;
     console.log('castText', castText);
-    console.log('replyTo', replyTo);
 
     const isAskingAboutBased = await generateSantaResponse(`User said: "${castText}". Return true if they are asking about BASED, false otherwise. Don't tag any user.`);
     console.log('isAskingAboutBased', isAskingAboutBased);
