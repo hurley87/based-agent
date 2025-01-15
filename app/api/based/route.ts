@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     return Response.json({ message: "Environment variables are not set" }, { status: 500 });
   }
 
-  Coinbase.configure({
+  const coinbase = Coinbase.configure({
     apiKeyName: API_KEY_NAME as string,
     privateKey: API_KEY_PRIVATE_KEY.replaceAll("\\n", "\n") as string,
   });
@@ -20,6 +20,7 @@ export async function POST(request: Request) {
   const config = {
     cdpWalletData: process.env.WALLET_DATA || undefined,
     networkId: process.env.NETWORK_ID || "base-sepolia",
+    coinbase,
   };
 
   console.log("config", config);
