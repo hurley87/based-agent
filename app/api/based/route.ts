@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     const cdpToolkit = new CdpToolkit(agentkit);
     const tools = cdpToolkit.getTools();
 
-    return NextResponse.json({ success: true, tools });
+    return NextResponse.json({ success: true, tools }, { status: 200 });
     
   } catch (error) {
     console.error('CDP configuration error:', error);
@@ -39,14 +39,6 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-}
-
-// Handle GET requests
-export async function GET() {
-  return NextResponse.json(
-    { error: "Method not allowed" },
-    { status: 405 }
-  );
 }
 
 export const dynamic = "force-dynamic";
