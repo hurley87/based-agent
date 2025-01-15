@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     return Response.json({ message: "Environment variables are not set" }, { status: 500 });
   }
 
-  new Coinbase({
+  Coinbase.configure({
     apiKeyName: API_KEY_NAME as string,
     privateKey: API_KEY_PRIVATE_KEY.replaceAll("\\n", "\n") as string,
   });
