@@ -221,11 +221,11 @@ export async function POST(request: Request) {
     );
     console.log("directReplies", directReplies);
 
-    // check if the direct replies contain the target word
-    const containsTargetWord = directReplies.some(reply => reply.includes(targetWord));
-    console.log("containsTargetWord", containsTargetWord);
+    // check if the direct replies contain the target word in two replies
+    const containsTargetWordTwoTimes = directReplies.filter(reply => reply.includes(targetWord)).length >= 2;
+    console.log("containsTargetWordTwoTimes", containsTargetWordTwoTimes);
 
-    if (containsTargetWord) {
+    if (containsTargetWordTwoTimes) {
       console.log("User won!!!!!!!");
       return NextResponse.json({ success: true }, { status: 200 });
     }
