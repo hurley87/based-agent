@@ -74,18 +74,23 @@ async function initializeGameAgent({
   const tools = cdpToolkit.getTools();
 
   const gameRules = `
-    You are hosting a game of Twenty Questions. The word is "${targetWord}".
+    You are an AI hosting a game and the secret word is "${targetWord}".
     
-    Rules:
-    1. Users can ask yes/no questions about the word
-    2. You must answer only with "Yes" or "No", followed by nothing else
-    3. If the user includes "${targetWord}" in their question:
-       - User must explicitly ask if the word is "${targetWord}"
-       - Transfer ${rewardAmount} 0x32E0f9d26D1e33625742A52620cC76C1130efde6 token to their wallet
-       - End the game
-    4. If they make any other direct guess, just respond with "No"
+    STRICT RESPONSE RULES:
+    1. ONLY respond with "Yes" or "No" to questions unless they win
+    2. NEVER provide hints or additional information
     
-    Keep your responses extremely concise - just "Yes" or "No" unless they win.
+    WINNING CONDITION:
+    - The player must EXPLICITLY include "${targetWord}" in their question
+    - When they do:
+      a. Transfer ${rewardAmount} $BASED token (0x32E0f9d26D1e33625742A52620cC76C1130efde6) to their wallet
+      b. Respond: "Correct! You've won ${rewardAmount} $BASED tokens!"
+    
+    HANDLING GUESSES:
+    1. If they make any other direct word guess → respond "No"
+    2. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No"
+    
+    REMEMBER: Keep ALL responses extremely concise. Only deviate from "Yes"/"No" when they win.
   `;
 
   const agent = createReactAgent({
@@ -230,14 +235,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true }, { status: 200 });
     }
 
-    const message = `${directReplies.join('\n')}User's question: "${userInput}"
+    const message = `
+    CONVERSATION HISTORY:
+    ${directReplies.join('\n')}
+    
+    CURRENT INTERACTION:
+    User's question: "${userInput}"
     User's wallet address: "${userWalletAddress}"
     
-    Remember:
-    1. You must answer only with "Yes" or "No", followed by nothing else
-    2. The user must explicitly ask if the word is "${targetWord}" to get the reward
-    2. If the user's question contains "${targetWord}", transfer ${rewardAmount} 0x32E0f9d26D1e33625742A52620cC76C1130efde6 token to their wallet, this is called the $BASED token
-    3. Otherwise, just answer "Yes" or "No" with no additional text`;
+    STRICT RESPONSE RULES:
+    1. ONLY respond with "Yes" or "No" to questions unless they win
+    2. NEVER provide hints or additional information
+    
+    WINNING CONDITION:
+    - The player must EXPLICITLY include "${targetWord}" in their question
+    - When they do:
+      a. Transfer ${rewardAmount} 0x32E0f9d26D1e33625742A52620cC76C1130efde6 token to their wallet
+      b. Respond: "Correct! You've won ${rewardAmount} $BASED tokens!"
+    
+    HANDLING GUESSES:
+    1. If they make any other direct word guess → respond "No"
+    2. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No"
+    
+    REMEMBER: Keep ALL responses extremely concise. Only deviate from "Yes"/"No" when they win.`;
 
     const stream = await agent.stream({ messages: [new HumanMessage(message)] }, config);
 
