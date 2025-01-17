@@ -77,10 +77,9 @@ async function initializeGameAgent({
     You are hosting a game of Twenty Questions. The word is "${targetWord}".
     
     Rules:
-    1. Users can ask up to 20 yes/no questions about the word
+    1. Users can ask yes/no questions about the word
     2. You must answer only with "Yes" or "No", followed by nothing else
-    3. If the user includes "${targetWord}" in their question, and the word is "${targetWord}":
-       - The question must contain "${targetWord}"
+    3. If the user includes "${targetWord}" in their question:
        - Congratulate them enthusiastically
        - Transfer ${rewardAmount} 0x32E0f9d26D1e33625742A52620cC76C1130efde6 token to their wallet
        - End the game
@@ -112,7 +111,7 @@ async function getFarcasterReplies(threadId: string, apiKey: string): Promise<st
   const url = new URL('https://api.neynar.com/v2/farcaster/cast/conversation');
   url.searchParams.set('identifier', threadId);
   url.searchParams.set('type', 'hash');
-  url.searchParams.set('reply_depth', '2');
+  url.searchParams.set('reply_depth', '5');
   url.searchParams.set('include_chronological_parent_casts', 'false');
   url.searchParams.set('limit', '20');
 
@@ -235,9 +234,8 @@ export async function POST(request: Request) {
     User's wallet address: "${userWalletAddress}"
     
     Remember:
-    1. There queston must contain "${targetWord}". If it does not, just answer "No"
-    2. If it does, transfer ${rewardAmount} 0x32E0f9d26D1e33625742A52620cC76C1130efde6 token to their wallet, this is called the $BASED token
-    3. Otherwise, just answer "Yes" or "No" with no additional text`;
+    1. If the question contains "${targetWord}", transfer ${rewardAmount} 0x32E0f9d26D1e33625742A52620cC76C1130efde6 token to their wallet, this is called the $BASED token
+    2. Otherwise, just answer "Yes" or "No" with no additional text`;
 
     const stream = await agent.stream({ messages: [new HumanMessage(message)] }, config);
 
