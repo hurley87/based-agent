@@ -226,7 +226,7 @@ export async function POST(request: Request) {
     console.log("containsTargetWordTwoTimes", containsTargetWordTwoTimes);
 
     if (containsTargetWordTwoTimes) {
-      console.log("User won!!!!!!!");
+      await sendFarcasterMessage('Correct but someone else already won.', replyTo);
       return NextResponse.json({ success: true }, { status: 200 });
     }
 
