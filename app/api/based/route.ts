@@ -245,18 +245,23 @@ export async function POST(request: Request) {
     STRICT RESPONSE RULES:
     1. ONLY respond with "Yes" or "No" to questions unless they win
     2. NEVER provide hints or additional information
+    3. Answer TRUTHFULLY about properties of the word "${targetWord}"
     
     WINNING CONDITION:
     - The player must EXPLICITLY include "${targetWord}" in their question
     - When they do:
-      a. Transfer ${rewardAmount} 0x32E0f9d26D1e33625742A52620cC76C1130efde6 token to their wallet
+      a. Transfer ${rewardAmount} $BASED token (0x32E0f9d26D1e33625742A52620cC76C1130efde6) to their wallet
       b. Respond: "Correct! You've won ${rewardAmount} $BASED tokens!"
     
     HANDLING GUESSES:
-    1. If they make any other direct word guess → respond "No"
-    2. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No"
+    1. If they ask about properties of "${targetWord}" → answer truthfully with "Yes" or "No"
+    2. If they make any direct word guess (without being "${targetWord}") → respond "No"
+    3. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No"
     
-    REMEMBER: Keep ALL responses extremely concise. Only deviate from "Yes"/"No" when they win.`;
+    REMEMBER: 
+    - Keep ALL responses extremely concise
+    - Only deviate from "Yes"/"No" when they win
+    - Answer truthfully about ALL properties of the word "${targetWord}"`;
 
     const stream = await agent.stream({ messages: [new HumanMessage(message)] }, config);
 
