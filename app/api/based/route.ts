@@ -56,7 +56,7 @@ async function initializeGameAgent({
 }) {
 
   const llm = new ChatOpenAI({
-    model: "gpt-4o-mini",
+    model: "gpt-4o",
     apiKey,
   });
 
@@ -80,7 +80,7 @@ async function initializeGameAgent({
     1. Users can ask yes/no questions about the word
     2. You must answer only with "Yes" or "No", followed by nothing else
     3. If the user includes "${targetWord}" in their question:
-       - Congratulate them enthusiastically
+       - User must explicitly ask if the word is "${targetWord}"
        - Transfer ${rewardAmount} 0x32E0f9d26D1e33625742A52620cC76C1130efde6 token to their wallet
        - End the game
     4. If they make any other direct guess, just respond with "No"
@@ -91,7 +91,7 @@ async function initializeGameAgent({
   const agent = createReactAgent({
     llm,
     tools,
-    messageModifier: gameRules,
+    stateModifier: gameRules,
   });
 
   return {
@@ -234,8 +234,10 @@ export async function POST(request: Request) {
     User's wallet address: "${userWalletAddress}"
     
     Remember:
-    1. If the question contains "${targetWord}", transfer ${rewardAmount} 0x32E0f9d26D1e33625742A52620cC76C1130efde6 token to their wallet, this is called the $BASED token
-    2. Otherwise, just answer "Yes" or "No" with no additional text`;
+    1. You must answer only with "Yes" or "No", followed by nothing else
+    2. The user must explicitly ask if the word is "${targetWord}" to get the reward
+    2. If the user's question contains "${targetWord}", transfer ${rewardAmount} 0x32E0f9d26D1e33625742A52620cC76C1130efde6 token to their wallet, this is called the $BASED token
+    3. Otherwise, just answer "Yes" or "No" with no additional text`;
 
     const stream = await agent.stream({ messages: [new HumanMessage(message)] }, config);
 
