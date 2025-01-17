@@ -180,6 +180,11 @@ export async function POST(request: Request) {
   console.log("userInput", userInput);
   console.log("userWalletAddress", userWalletAddress);
 
+  if(!userWalletAddress) {
+    await sendFarcasterMessage("You'll need a wallet to play.", replyTo);
+    return NextResponse.json({ success: false }, { status: 400 });
+  }
+
   const threadId = data.thread_hash;
   console.log("threadId", threadId);
   const targetWord = process.env.SECRET_WORD as string;
