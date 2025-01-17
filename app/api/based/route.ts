@@ -226,7 +226,6 @@ export async function POST(request: Request) {
     );
     console.log("directReplies", directReplies);
 
-    // check if the direct replies contain the target word in two replies
     const containsTargetWordTwoTimes = directReplies.filter(reply => reply.includes(targetWord)).length >= 2;
     console.log("containsTargetWordTwoTimes", containsTargetWordTwoTimes);
 
