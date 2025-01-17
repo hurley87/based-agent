@@ -131,6 +131,41 @@ async function getFarcasterReplies(threadId: string, apiKey: string): Promise<st
   return conversation.cast.direct_replies.map((reply: { text: string }) => reply.text);
 }
 
+
+/**
+ * Sends a message to a Farcaster conversation thread
+ * @param text - The message to send
+ * @param replyTo - The hash identifier of the Farcaster thread
+ * @returns The response from the Farcaster API
+ */
+async function sendFarcasterMessage(text: string, replyTo: string) {
+  const uuid = process.env.SIGNER_UUID as string;
+  const url = 'https://api.neynar.com/v2/farcaster/cast';
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      'x-api-key': process.env.NEYNAR_API_KEY as string,
+    },
+    body: JSON.stringify({
+      signer_uuid: uuid,
+      text,
+      parent: replyTo,
+    })
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const json = await response.json();
+    console.log(json);
+    return json;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
 /**
  * POST handler for the game endpoint
  */
@@ -140,6 +175,7 @@ export async function POST(request: Request) {
 
   const userInput = data.text;
   const userWalletAddress = data.author.verified_addresses?.eth_addresses?.[0];
+  const replyTo = data.hash;
 
   console.log("userInput", userInput);
   console.log("userWalletAddress", userWalletAddress);
@@ -208,6 +244,8 @@ export async function POST(request: Request) {
     }
 
     console.log("agentResponse", agentResponse);
+
+    await sendFarcasterMessage(agentResponse, replyTo);
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
