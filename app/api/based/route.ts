@@ -135,17 +135,16 @@ async function getFarcasterReplies(threadId: string, apiKey: string): Promise<st
  * POST handler for the game endpoint
  */
 export async function POST(request: Request) {
-  const { data, uuid } = await request.json();
+  const { data } = await request.json();
   console.log("data", data);
-  console.log("uuid", uuid);
 
-  const userInput = data.userInput;
+  const userInput = data.text;
   const userWalletAddress = data.author.verified_addresses?.eth_addresses?.[0];
 
   console.log("userInput", userInput);
   console.log("userWalletAddress", userWalletAddress);
 
-  const threadId = data.threadHash;
+  const threadId = data.thread_hash;
   console.log("threadId", threadId);
   const targetWord = process.env.SECRET_WORD as string;
   const rewardAmount = "1";
