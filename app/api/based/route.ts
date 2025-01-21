@@ -112,13 +112,13 @@ async function initializeGameAgent({
  * @param apiKey - The Neynar API key
  * @returns Array of direct reply texts from the conversation
  */
-async function getFarcasterReplies(threadId: string, apiKey: string): Promise<string[]> {
+async function getFarcasterReplies(threadId: string, apiKey: string): Promise<{ text: string, author: string }[]> {
   const url = new URL('https://api.neynar.com/v2/farcaster/cast/conversation');
   url.searchParams.set('identifier', threadId);
   url.searchParams.set('type', 'hash');
-  url.searchParams.set('reply_depth', '5');
-  url.searchParams.set('include_chronological_parent_casts', 'false');
-  url.searchParams.set('limit', '20');
+  url.searchParams.set('reply_depth', '1');
+  url.searchParams.set('include_chronological_parent_casts', 'true');
+  url.searchParams.set('limit', '50');
 
   const response = await fetch(url, {
     method: 'GET',
@@ -133,7 +133,15 @@ async function getFarcasterReplies(threadId: string, apiKey: string): Promise<st
   }
 
   const { conversation } = await response.json();
-  return conversation.cast.direct_replies.map((reply: { text: string }) => reply.text);
+  console.log("conversation", conversation);
+  return conversation.cast.direct_replies.map((reply: { text: string, author: { 
+    verified_addresses: { eth_addresses: string[] }
+   } }) => {
+    return {
+      text: reply.text,
+      author: reply.author.verified_addresses?.eth_addresses?.[0],
+    };
+  });
 }
 
 
@@ -226,8 +234,20 @@ export async function POST(request: Request) {
     );
     console.log("directReplies", directReplies);
 
-    const containsTargetWordTwoTimes = directReplies.filter(reply => reply.includes(targetWord)).length >= 2;
+    const containsTargetWordTwoTimes = directReplies.filter(reply => reply.text.toLowerCase().includes(targetWord.toLowerCase())).length >= 2;
     console.log("containsTargetWordTwoTimes", containsTargetWordTwoTimes);
+
+    // count how many times the author of the direct replies is the same as the user
+    const authorCount = directReplies.filter(reply => reply.author.toLowerCase() === userWalletAddress.toLowerCase()).length;
+    console.log("authorCount", authorCount);
+
+    const userHasGuessedTooManyTimes = authorCount >= 20;
+    console.log("userHasGuessedTooManyTimes", userHasGuessedTooManyTimes);
+
+    if (userHasGuessedTooManyTimes) {
+      await sendFarcasterMessage('You have guessed too many times, you lose.', replyTo);
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
 
     if (containsTargetWordTwoTimes) {
       await sendFarcasterMessage('Correct but someone else already won.', replyTo);
@@ -241,6 +261,7 @@ export async function POST(request: Request) {
     CURRENT INTERACTION:
     User's question: "${userInput}"
     User's wallet address: "${userWalletAddress}"
+    User's guess count: ${authorCount}
     
     STRICT RESPONSE RULES:
     1. ONLY respond with "Yes" or "No" to questions unless they win
@@ -257,7 +278,9 @@ export async function POST(request: Request) {
     1. If they ask about properties of "${targetWord}" → answer truthfully with "Yes" or "No"
     2. If they make any direct word guess (without being "${targetWord}") → respond "No"
     3. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No"
-    
+    4. They can ouly guess 20 times, if they guess more than 20 times, respond "You've guessed too many times, you lose."
+    5. Update how many guesses a user has left
+
     REMEMBER: 
     - Keep ALL responses extremely concise
     - Only deviate from "Yes"/"No" when they win
