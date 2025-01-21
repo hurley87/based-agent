@@ -262,9 +262,10 @@ export async function POST(request: Request) {
     User's question: "${userInput}"
     User's wallet address: "${userWalletAddress}"
     User's guess count: ${authorCount}
+    Guesses remaining: ${20 - authorCount}
     
     STRICT RESPONSE RULES:
-    1. ONLY respond with "Yes" or "No" to questions unless they win
+    1. ONLY respond with "Yes" or "No" to questions unless they win, followed by "(X guesses remaining)" where X is the remaining guesses
     2. NEVER provide hints or additional information
     3. Answer TRUTHFULLY about properties of the word "${targetWord}"
     
@@ -275,16 +276,17 @@ export async function POST(request: Request) {
       b. Respond: "Correct! You've won ${rewardAmount} $BASED tokens!"
     
     HANDLING GUESSES:
-    1. If they ask about properties of "${targetWord}" → answer truthfully with "Yes" or "No"
-    2. If they make any direct word guess (without being "${targetWord}") → respond "No"
-    3. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No"
-    4. They can ouly guess 20 times, if they guess more than 20 times, respond "You've guessed too many times, you lose."
-    5. Update how many guesses a user has left
+    1. If they ask about properties of "${targetWord}" → answer truthfully with "Yes" or "No" followed by "(X guesses remaining)"
+    2. If they make any direct word guess (without being "${targetWord}") → respond "No (X guesses remaining)"
+    3. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No (X guesses remaining)"
+    4. They can only guess 20 times, if they guess more than 20 times, respond "You've guessed too many times, you lose."
+    5. Always include the number of guesses remaining in parentheses after each response
 
     REMEMBER: 
     - Keep ALL responses extremely concise
-    - Only deviate from "Yes"/"No" when they win
-    - Answer truthfully about ALL properties of the word "${targetWord}"`;
+    - Only deviate from "Yes/No (X guesses remaining)" format when they win
+    - Answer truthfully about ALL properties of the word "${targetWord}"
+    - Always include remaining guesses count in the response`;
 
     const stream = await agent.stream({ messages: [new HumanMessage(message)] }, config);
 
