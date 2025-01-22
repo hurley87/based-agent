@@ -234,7 +234,6 @@ export async function POST(request: Request) {
     console.log("containsTargetWordTwoTimes", containsTargetWordTwoTimes);
 
     const authorCount = directReplies.filter(reply => reply.author.toLowerCase() === userWalletAddress.toLowerCase()).length;
-    console.log("authorCount", authorCount);
 
     const userHasGuessedTooManyTimes = authorCount >= 20;
 
