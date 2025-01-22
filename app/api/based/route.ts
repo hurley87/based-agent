@@ -171,7 +171,6 @@ async function sendFarcasterMessage(text: string, replyTo: string) {
   try {
     const response = await fetch(url, options);
     const json = await response.json();
-    console.log(json);
     return json;
   } catch (err) {
     console.error(err);
@@ -199,7 +198,6 @@ export async function POST(request: Request) {
   }
 
   const threadId = data.thread_hash;
-  console.log("threadId", threadId);
   const targetWord = process.env.SECRET_WORD as string;
   const rewardAmount = "1";
 
@@ -214,8 +212,6 @@ export async function POST(request: Request) {
       targetWord,
       rewardAmount
     };
-
-    console.log("networkId", env.NETWORK_ID);
 
     const { agent, config } = await initializeGameAgent({
       cdpApiKeyName: env.API_KEY_NAME,
@@ -237,12 +233,10 @@ export async function POST(request: Request) {
     const containsTargetWordTwoTimes = directReplies.filter(reply => reply.text.toLowerCase().includes(targetWord.toLowerCase())).length >= 2;
     console.log("containsTargetWordTwoTimes", containsTargetWordTwoTimes);
 
-    // count how many times the author of the direct replies is the same as the user
     const authorCount = directReplies.filter(reply => reply.author.toLowerCase() === userWalletAddress.toLowerCase()).length;
     console.log("authorCount", authorCount);
 
     const userHasGuessedTooManyTimes = authorCount >= 20;
-    console.log("userHasGuessedTooManyTimes", userHasGuessedTooManyTimes);
 
     if (userHasGuessedTooManyTimes) {
       await sendFarcasterMessage('You have guessed too many times, you lose.', replyTo);
