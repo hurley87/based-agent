@@ -270,15 +270,14 @@ export async function POST(request: Request) {
     3. Answer TRUTHFULLY about properties of the word "${targetWord}"
     
     WINNING CONDITION:
-    - The player must EXPLICITLY include "${targetWord}" in their question
-    - When they do:
+    - If the player directly asks "Is it ${targetWord}?" OR explicitly guesses "${targetWord}" as the word:
       a. Transfer ${rewardAmount} $BASED token (0x32E0f9d26D1e33625742A52620cC76C1130efde6) to their wallet
       b. Respond: "Correct! You've won ${rewardAmount} $BASED tokens!"
     
     HANDLING GUESSES:
     1. If they ask about properties of "${targetWord}" → answer truthfully with "Yes" or "No" followed by "(X guesses remaining)"
-    2. If they make any direct word guess (without being "${targetWord}") → respond "No (X guesses remaining)"
-    3. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No (X guesses remaining)"
+    2. If they make any other word guess → respond "No (X guesses remaining)"
+    3. If they mention "${targetWord}" in a question without explicitly guessing it → respond normally about the property they're asking
     4. They can only guess 20 times, if they guess more than 20 times, respond "You've guessed too many times, you lose."
     5. Always include the number of guesses remaining in parentheses after each response
 
@@ -286,7 +285,8 @@ export async function POST(request: Request) {
     - Keep ALL responses extremely concise
     - Only deviate from "Yes/No (X guesses remaining)" format when they win
     - Answer truthfully about ALL properties of the word "${targetWord}"
-    - Always include remaining guesses count in the response`;
+    - Always include remaining guesses count in the response
+    - "Is it ${targetWord}?" should trigger a win condition`;
 
     const stream = await agent.stream({ messages: [new HumanMessage(message)] }, config);
 
