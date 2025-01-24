@@ -116,7 +116,7 @@ async function getFarcasterReplies(threadId: string, apiKey: string): Promise<{ 
   const url = new URL('https://api.neynar.com/v2/farcaster/cast/conversation');
   url.searchParams.set('identifier', threadId);
   url.searchParams.set('type', 'hash');
-  url.searchParams.set('reply_depth', '2');
+  url.searchParams.set('reply_depth', '1');
   url.searchParams.set('include_chronological_parent_casts', 'true');
   url.searchParams.set('limit', '50');
 
@@ -133,7 +133,7 @@ async function getFarcasterReplies(threadId: string, apiKey: string): Promise<{ 
   }
 
   const { conversation } = await response.json();
-  // console.log("conversation", conversation);
+  console.log("conversation", conversation);
   return conversation.cast.direct_replies.map((reply: { text: string, author: { 
     verified_addresses: { eth_addresses: string[] }
    } }) => {
@@ -171,6 +171,7 @@ async function sendFarcasterMessage(text: string, replyTo: string) {
   try {
     const response = await fetch(url, options);
     const json = await response.json();
+    console.log(json);
     return json;
   } catch (err) {
     console.error(err);
@@ -198,6 +199,7 @@ export async function POST(request: Request) {
   }
 
   const threadId = data.thread_hash;
+  console.log("threadId", threadId);
   const targetWord = process.env.SECRET_WORD as string;
   const rewardAmount = "1";
 
@@ -212,6 +214,8 @@ export async function POST(request: Request) {
       targetWord,
       rewardAmount
     };
+
+    console.log("networkId", env.NETWORK_ID);
 
     const { agent, config } = await initializeGameAgent({
       cdpApiKeyName: env.API_KEY_NAME,
@@ -231,10 +235,14 @@ export async function POST(request: Request) {
     console.log("directReplies", directReplies);
 
     const containsTargetWordTwoTimes = directReplies.filter(reply => reply.text.toLowerCase().includes(targetWord.toLowerCase())).length >= 2;
+    console.log("containsTargetWordTwoTimes", containsTargetWordTwoTimes);
 
+    // count how many times the author of the direct replies is the same as the user
     const authorCount = directReplies.filter(reply => reply.author.toLowerCase() === userWalletAddress.toLowerCase()).length;
+    console.log("authorCount", authorCount);
 
     const userHasGuessedTooManyTimes = authorCount >= 20;
+    console.log("userHasGuessedTooManyTimes", userHasGuessedTooManyTimes);
 
     if (userHasGuessedTooManyTimes) {
       await sendFarcasterMessage('You have guessed too many times, you lose.', replyTo);
@@ -254,31 +262,29 @@ export async function POST(request: Request) {
     User's question: "${userInput}"
     User's wallet address: "${userWalletAddress}"
     User's guess count: ${authorCount}
-    Guesses remaining: ${20 - authorCount}
     
     STRICT RESPONSE RULES:
-    1. ONLY respond with "Yes" or "No" to questions unless they win, followed by "(X guesses remaining)" where X is the remaining guesses
+    1. ONLY respond with "Yes" or "No" to questions unless they win
     2. NEVER provide hints or additional information
     3. Answer TRUTHFULLY about properties of the word "${targetWord}"
     
     WINNING CONDITION:
-    - If the player directly asks "Is it ${targetWord}?" OR explicitly guesses "${targetWord}" as the word:
+    - The player must EXPLICITLY include "${targetWord}" in their question
+    - When they do:
       a. Transfer ${rewardAmount} $BASED token (0x32E0f9d26D1e33625742A52620cC76C1130efde6) to their wallet
       b. Respond: "Correct! You've won ${rewardAmount} $BASED tokens!"
     
     HANDLING GUESSES:
-    1. If they ask about properties of "${targetWord}" → answer truthfully with "Yes" or "No" followed by "(X guesses remaining)"
-    2. If they make any other word guess → respond "No (X guesses remaining)"
-    3. If they mention "${targetWord}" in a question without explicitly guessing it → respond normally about the property they're asking
-    4. They can only guess 20 times, if they guess more than 20 times, respond "You've guessed too many times, you lose."
-    5. Always include the number of guesses remaining in parentheses after each response
+    1. If they ask about properties of "${targetWord}" → answer truthfully with "Yes" or "No"
+    2. If they make any direct word guess (without being "${targetWord}") → respond "No"
+    3. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No"
+    4. They can ouly guess 20 times, if they guess more than 20 times, respond "You've guessed too many times, you lose."
+    5. Update how many guesses a user has left
 
     REMEMBER: 
     - Keep ALL responses extremely concise
-    - Only deviate from "Yes/No (X guesses remaining)" format when they win
-    - Answer truthfully about ALL properties of the word "${targetWord}"
-    - Always include remaining guesses count in the response
-    - "Is it ${targetWord}?" should trigger a win condition`;
+    - Only deviate from "Yes"/"No" when they win
+    - Answer truthfully about ALL properties of the word "${targetWord}"`;
 
     const stream = await agent.stream({ messages: [new HumanMessage(message)] }, config);
 
