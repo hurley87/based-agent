@@ -133,7 +133,7 @@ async function getFarcasterReplies(threadId: string, apiKey: string): Promise<{ 
   }
 
   const { conversation } = await response.json();
-  console.log("conversation", conversation);
+  // console.log("conversation", conversation);
   return conversation.cast.direct_replies.map((reply: { text: string, author: { 
     verified_addresses: { eth_addresses: string[] }
    } }) => {
