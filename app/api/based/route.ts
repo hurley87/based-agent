@@ -201,7 +201,7 @@ export async function POST(request: Request) {
   const threadId = data.thread_hash;
   console.log("threadId", threadId);
   const targetWord = process.env.SECRET_WORD as string;
-  const rewardAmount = "1";
+  const rewardAmount = "1000000";
 
   try {
 
