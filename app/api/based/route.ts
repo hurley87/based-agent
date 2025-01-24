@@ -116,7 +116,7 @@ async function getFarcasterReplies(threadId: string, apiKey: string): Promise<{ 
   const url = new URL('https://api.neynar.com/v2/farcaster/cast/conversation');
   url.searchParams.set('identifier', threadId);
   url.searchParams.set('type', 'hash');
-  url.searchParams.set('reply_depth', '1');
+  url.searchParams.set('reply_depth', '2');
   url.searchParams.set('include_chronological_parent_casts', 'true');
   url.searchParams.set('limit', '50');
 
