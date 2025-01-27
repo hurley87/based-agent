@@ -32,6 +32,26 @@ interface AgentConfig {
   sourceVersion: string;
 }
 
+interface FarcasterReply {
+  text: string;
+  author: {
+    verified_addresses: {
+      eth_addresses: string[];
+    };
+  };
+}
+
+interface ConversationResponse {
+  conversation: {
+    cast: {
+      direct_replies: FarcasterReply[];
+    };
+    next?: {
+      cursor?: string;
+    };
+  };
+}
+
 /**
  * Initializes the game agent with the specified configuration
  */
@@ -110,15 +130,20 @@ async function initializeGameAgent({
  * Fetches direct replies from a Farcaster conversation thread
  * @param threadId - The hash identifier of the Farcaster thread
  * @param apiKey - The Neynar API key
+ * @param cursor - The cursor to fetch the next page of replies
  * @returns Array of direct reply texts from the conversation
  */
-async function getFarcasterReplies(threadId: string, apiKey: string): Promise<{ text: string, author: string }[]> {
+async function getFarcasterReplies(threadId: string, apiKey: string, cursor: string): Promise<{ text: string, author: string }[]> {
   const url = new URL('https://api.neynar.com/v2/farcaster/cast/conversation');
   url.searchParams.set('identifier', threadId);
   url.searchParams.set('type', 'hash');
   url.searchParams.set('reply_depth', '1');
   url.searchParams.set('include_chronological_parent_casts', 'true');
   url.searchParams.set('limit', '50');
+  
+  if (cursor) {
+    url.searchParams.set('cursor', cursor);
+  }
 
   const response = await fetch(url, {
     method: 'GET',
@@ -132,16 +157,26 @@ async function getFarcasterReplies(threadId: string, apiKey: string): Promise<{ 
     throw new Error(`Failed to fetch Farcaster replies: ${response.statusText}`);
   }
 
-  const { conversation } = await response.json();
-  console.log("conversation", conversation);
-  return conversation.cast.direct_replies.map((reply: { text: string, author: { 
-    verified_addresses: { eth_addresses: string[] }
-   } }) => {
-    return {
-      text: reply.text,
-      author: reply.author.verified_addresses?.eth_addresses?.[0],
-    };
-  });
+  const data = await response.json() as ConversationResponse;
+  
+  // Handle case where conversation doesn't exist or is empty
+  if (!data.conversation?.cast?.direct_replies) {
+    return [];
+  }
+
+  const currentReplies = data.conversation.cast.direct_replies.map((reply) => ({
+    text: reply.text,
+    author: reply.author.verified_addresses?.eth_addresses?.[0] ?? '',
+  }));
+
+  // Check if there are more replies to fetch
+  const nextCursor = data.conversation.next?.cursor;
+  if (nextCursor) {
+    const nextReplies = await getFarcasterReplies(threadId, apiKey, nextCursor);
+    return [...currentReplies, ...nextReplies];
+  }
+
+  return currentReplies;
 }
 
 
@@ -230,7 +265,8 @@ export async function POST(request: Request) {
 
     const directReplies = await getFarcasterReplies(
       threadId, 
-      process.env.NEYNAR_API_KEY || ''
+      process.env.NEYNAR_API_KEY || '',
+      ''
     );
     console.log("directReplies", directReplies);
 
@@ -264,7 +300,7 @@ export async function POST(request: Request) {
     User's guess count: ${authorCount}
     
     STRICT RESPONSE RULES:
-    1. ONLY respond with "Yes" or "No" to questions unless they win
+    1. For Yes/No responses, format as "Yes (X guesses remaining)" or "No (X guesses remaining)" where X is (20 - guess count)
     2. NEVER provide hints or additional information
     3. Answer TRUTHFULLY about properties of the word "${targetWord}"
     
@@ -275,15 +311,15 @@ export async function POST(request: Request) {
       b. Respond: "Correct! You've won ${rewardAmount} $BASED tokens!"
     
     HANDLING GUESSES:
-    1. If they ask about properties of "${targetWord}" → answer truthfully with "Yes" or "No"
-    2. If they make any direct word guess (without being "${targetWord}") → respond "No"
-    3. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No"
-    4. They can ouly guess 20 times, if they guess more than 20 times, respond "You've guessed too many times, you lose."
-    5. Update how many guesses a user has left
+    1. If they ask about properties of "${targetWord}" → answer truthfully with "Yes (X guesses remaining)" or "No (X guesses remaining)"
+    2. If they make any direct word guess (without being "${targetWord}") → respond "No (X guesses remaining)"
+    3. If they include "${targetWord}" in their question but don't explicitly ask if it's the word → respond "No (X guesses remaining)"
+    4. They can only guess 20 times, if they guess more than 20 times, respond "You've guessed too many times, you lose."
+    5. Always include remaining guesses in the format "(X guesses remaining)" unless they win or lose
 
     REMEMBER: 
     - Keep ALL responses extremely concise
-    - Only deviate from "Yes"/"No" when they win
+    - Only deviate from "Yes/No (X guesses remaining)" format when they win or lose
     - Answer truthfully about ALL properties of the word "${targetWord}"`;
 
     const stream = await agent.stream({ messages: [new HumanMessage(message)] }, config);
